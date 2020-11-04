@@ -1,0 +1,10 @@
+vao ---> | attrib[0] |--- vbo ---> vec3 array { {x,y,z}, ... }; //3d-坐标
+         |-----------|
+         | attrib[1] |--- vbo ---> vec2 array { {x,y}, ... };//whatever
+         |-----------|
+         |   ...     |
+         |-----------|
+         | attrib[k] |--- vbo ---> vec4 array { {x,y,z,w}, ... };    
+         ~~~~~~~~~~~
+
+
