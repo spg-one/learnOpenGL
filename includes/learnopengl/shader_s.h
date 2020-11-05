@@ -42,6 +42,7 @@ public:
             fShaderFile.close();
             // convert stream into string
             vertexCode = vShaderStream.str();
+            //std::cout<<vertexCode<<"hh"<<"\n"<<std::endl;
             fragmentCode = fShaderStream.str();			
             // if geometry shader path is present, also load a geometry shader
             if(geometryPath != nullptr)
