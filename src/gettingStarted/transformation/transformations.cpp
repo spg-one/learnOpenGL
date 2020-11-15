@@ -19,6 +19,11 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+//degrees
+float deg = 0.0;
+float temp = 0.0;
+float* degp = &deg;
+
 int main()
 {
     // glfw: initialize and configure
@@ -34,7 +39,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Try to press space key!!!", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -147,7 +152,7 @@ int main()
     ourShader.setInt("texture1", 0);
     ourShader.setInt("texture2", 1);
 
-
+    
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -170,7 +175,8 @@ int main()
         // create transformations
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        deg++;
+        transform = glm::rotate(transform, glm::radians((*degp)), glm::vec3(0.0f, 0.0f, 1.0f));
 
         // get matrix's uniform location and set matrix
         ourShader.use();
@@ -205,6 +211,17 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    
+    if (glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        temp = deg;
+        degp = &temp;
+    }
+    if (glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_RELEASE)
+    {
+        deg = temp;
+        degp = &deg;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
