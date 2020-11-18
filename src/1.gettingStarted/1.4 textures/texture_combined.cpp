@@ -4,25 +4,20 @@
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <learnopengl/shader_s.h>
 
 #include <iostream>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-//degrees
-float deg = 0.0;
-float temp = 0.0;
-float* degp = &deg;
+float mix = 0.3;
+int sem_up = 1;
+int sem_down = 1;
 
 int main()
 {
@@ -39,7 +34,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Try to press space key!!!", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -59,16 +54,16 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader("./5.1.transform.vs", "./5.1.transform.fs");
+    Shader ourShader("4.2.texture.vs", "4.2.texture.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
-        // positions          // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
-         0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
+        // positions          // colors           // texture coords (note that we changed them to 'zoom in' on our texture image)
+        0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.55f, 0.55f,   // top right
+        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.55f, 0.45f,  // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.45f, 0.45f, // bottom left
+        -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.45f, 0.55f   // top left
     };
     unsigned int indices[] = {
         0, 1, 3, // first triangle
@@ -88,14 +83,16 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
-
-    // load and create a texture 
+    // load and create a texture
     // -------------------------
     unsigned int texture1, texture2;
     // texture 1
@@ -103,14 +100,15 @@ int main()
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
     // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // note that we set the container wrapping method to GL_CLAMP_TO_EDGE
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // set texture filtering to nearest neighbor to clearly see the texels/pixels
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
     unsigned char *data = stbi_load("../../../resources/textures/container.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
@@ -127,11 +125,11 @@ int main()
     glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
     // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // set texture filtering to nearest neighbor to clearly see the texels/pixels
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     // load image, create texture and generate mipmaps
     data = stbi_load("../../../resources/textures/awesomeface.png", &width, &height, &nrChannels, 0);
     if (data)
@@ -148,11 +146,12 @@ int main()
 
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     // -------------------------------------------------------------------------------------------
-    ourShader.use(); 
-    ourShader.setInt("texture1", 0);
+    ourShader.use(); // don't forget to activate/use the shader before setting uniforms!
+    // either set it manually like so:
+    glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
+    // or set it via the texture class
     ourShader.setInt("texture2", 1);
 
-    
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -172,19 +171,10 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
-        // create transformations
-        glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        deg++;
-        transform = glm::rotate(transform, glm::radians((*degp)), glm::vec3(0.0f, 0.0f, 1.0f));
-
-        // get matrix's uniform location and set matrix
-        ourShader.use();
-        unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-
         // render container
+        ourShader.use();
         glBindVertexArray(VAO);
+        ourShader.setFloat("mixV", mix);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -211,24 +201,39 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    
-    if (glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && sem_up == 1)
     {
-        temp = deg;
-        degp = &temp;
+        sem_up--;
+        mix += 0.1;
+
+        if (mix > 1)
+            mix = 1.0;
+        std::cout << mix << std::endl;
     }
-    if (glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_RELEASE)
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_RELEASE && sem_up == 0)
     {
-        deg = temp;
-        degp = &deg;
+        sem_up++;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && sem_down == 1)
+    {
+        sem_down--;
+        mix -= 0.1;
+
+        if (mix < 0)
+            mix = 0.0;
+        std::cout << mix << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_RELEASE && sem_down == 0)
+    {
+        sem_down++;
     }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
