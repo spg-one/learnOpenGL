@@ -152,6 +152,9 @@ int main()
     // or set it via the texture class
     ourShader.setInt("texture2", 1);
 
+    ourShader.use();
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -172,8 +175,6 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture2);
 
         // render container
-        ourShader.use();
-        glBindVertexArray(VAO);
         ourShader.setFloat("mixV", mix);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
