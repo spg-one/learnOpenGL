@@ -12,7 +12,8 @@
         "${fileDirname}\\${fileBasenameNoExtension}.exe",
         "-I",
         "includes",
-        "dll/glfw3.dll"
+        "dll/glfw3.dll",
+       
       ],
       "options": {
         "cwd": "${workspaceFolder}"
