@@ -12,8 +12,10 @@
         "${fileDirname}\\${fileBasenameNoExtension}.exe",
         "-I",
         "includes",
-        "dll/glfw3.dll",
-       
+        "-L",
+        "${workspaceFolder}/lib",
+        "-lglfw3dll",
+        "-lassimp"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
