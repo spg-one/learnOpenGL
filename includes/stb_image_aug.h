@@ -1,6 +1,4 @@
 /* stbi-1.16 - public domain JPEG/PNG reader - http://nothings.org/stb_image.c
-                      when you control the images you're loading
-
    QUICK NOTES:
       Primarily of interest to game developers and other people who can
           avoid problematic images and only need the trivial interface
@@ -15,7 +13,7 @@
       decoded from memory or through stdio FILE (define STBI_NO_STDIO to remove code)
       supports installable dequantizing-IDCT, YCbCr-to-RGB conversion (define STBI_SIMD)
         
-   TODO:
+   
       stbi_info_*
   
    history:

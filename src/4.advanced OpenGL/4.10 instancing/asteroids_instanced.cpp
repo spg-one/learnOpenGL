@@ -1,5 +1,5 @@
 
-
+// NOTE you should put all the .dll & .exe files along with this generated .exe file
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 

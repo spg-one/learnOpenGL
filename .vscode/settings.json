@@ -46,6 +46,10 @@
         "functional": "cpp",
         "iterator": "cpp",
         "ratio": "cpp",
-        "iomanip": "cpp"
-    }
+        "iomanip": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp"
+    },
+    "todo-tree.tree.showCountsInTree": false
 }

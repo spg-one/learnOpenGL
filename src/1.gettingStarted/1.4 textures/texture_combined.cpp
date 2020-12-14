@@ -155,7 +155,11 @@ int main()
 
     ourShader.use();
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); 
+    
+    std::cout << (const char *) glGetString(GL_VERSION) << std::endl;
+    std::cout << (const char *) glGetString(GL_VENDOR) << std::endl; 
+    std::cout << (const char *) glGetString(GL_RENDERER) << std::endl;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -194,6 +198,7 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+    
     return 0;
 }
 
