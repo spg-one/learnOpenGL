@@ -117,6 +117,7 @@ int main()
         glm::vec3( 1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
+    // TODO 这里的VAO为什么只有一个，而4.10的asteroids那里每一个石头都有一个VAO
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
